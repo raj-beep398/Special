@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Special Moments</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Montserrat:wght@300;400;600&family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #e0f7fa, #80deea);
+            color: #333;
+            padding: 2rem;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2.5rem;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            transform: scale(0.95);
+            animation: fadeIn 1.2s ease forwards;
+            position: relative;
+            z-index: 1;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #4dd0e1;
+            opacity: 0;
+            animation: fallDown 5s ease-in-out infinite;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        h1 {
+            font-family: 'Pacifico', cursive;
+            font-size: 4rem;
+            color: #00acc1;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            animation: glowText 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glowText {
+            from {
+                text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #00acc1, 0 0 20px #00acc1;
+            }
+            to {
+                text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #00acc1, 0 0 40px #00acc1;
+            }
+        }
+
+        .subtitle {
+            font-size: 1.4rem;
+            color: #777;
+            font-weight: 300;
+            margin-bottom: 1.5rem;
+            font-family: 'Dancing Script', cursive;
+        }
+
+        /* Photo Gallery */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .photo-frame {
+            background: white;
+            padding: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            animation: fadeInPhoto 0.8s ease forwards;
+            opacity: 0;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            aspect-ratio: 1/1;
+            border-radius: 4px;
+        }
+
+        .photo-frame::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 100%);
+            z-index: 1;
+            transform: translateY(-100%) rotate(45deg);
+            transition: transform 0.6s;
+        }
+
+        .photo-frame:hover::before {
+            transform: translateY(100%) rotate(45deg);
+        }
+
+        .photo-frame:hover {
+            transform: translateY(-15px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(0, 172, 193, 0.3);
+            z-index: 2;
+        }
+
+        .photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: filter 0.3s;
+        }
+
+        .photo-frame:hover img {
+            filter: brightness(1.1);
+        }
+
+        /* Decoration */
+        .bubble-decoration {
+            position: absolute;
+            color: rgba(0, 172, 193, 0.1);
+            font-size: 8rem;
+            z-index: 0;
+        }
+
+        .bubble-1 {
+            top: 10%;
+            left: 5%;
+            transform: rotate(-20deg);
+        }
+
+        .bubble-2 {
+            bottom: 15%;
+            right: 8%;
+            transform: rotate(15deg);
+            font-size: 6rem;
+        }
+
+        /* Floating Bubbles */
+        .bubbles-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .bubble {
+            position: absolute;
+            bottom: -50px;
+            opacity: 0;
+            font-size: 30px;
+            filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.2));
+            animation: floatUp 10s ease-in infinite;
+        }
+
+        /* Message Section */
+        .message-section {
+            margin: 4rem 0;
+            text-align: center;
+            position: relative;
+            padding: 3rem;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px rgba(0, 172, 193, 0.1);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .message-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.5rem;
+            color: #00acc1;
+            margin-bottom: 1.5rem;
+        }
+
+        .message-content {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: #555;
+            font-style: italic;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .signature {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.8rem;
+            color: #00acc1;
+            margin-top: 2rem;
+            font-weight: bold;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes fadeInPhoto {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes floatUp {
+            0% {
+                opacity: 0;
+                bottom: -50px;
+                transform: translateX(0) rotate(0);
+            }
+            10% {
+                opacity: 1;
+                transform: translateX(var(--translateX)) rotate(var(--rotate));
+            }
+            80% {
+                opacity: 0.8;
+            }
+            100% {
+                bottom: 110%;
+                opacity: 0;
+                transform: translateX(calc(var(--translateX) * 2)) rotate(calc(var(--rotate) * 2));
+            }
+        }
+
+        @keyframes fallDown {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(calc(100vh + 100px)) rotate(720deg);
+                opacity: 0.3;
+            }
+        }
+
+        .special-button {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 1rem 2rem;
+            background: linear-gradient(45deg, #26c6da, #00acc1);
+            color: white;
+            font-weight: bold;
+            border-radius: 50px;
+            text-decoration: none;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 172, 193, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .special-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 172, 193, 0.6);
+        }
+
+        .special-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: all 0.6s;
+        }
+
+        .special-button:hover::before {
+            left: 100%;
+        }
+
+        /* Media Queries */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .container {
+                padding: 1.5rem;
+            }
+            
+            h1 {
+                font-size: 3rem;
+            }
+            
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 1.5rem;
+            }
+
+            .message-section {
+                padding: 2rem 1rem;
+            }
+
+            .message-title {
+                font-size: 2rem;
+            }
+
+            .message-content {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+                gap: 1rem;
+            }
+            
+            .photo-frame {
+                padding: 5px;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .subtitle {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="confetti-container" id="confettiContainer"></div>
+    
+    <div class="container">
+        <header>
+            <h1>Our Special Moments</h1>
+            <p class="subtitle">Celebrating the memories we've created together...</p>
+        </header>
+
+        <div class="gallery">
+            <div class="photo-frame" style="--delay: 0.1s;">
+                <img src="./pic1.jpg" alt="Special Moment 1">
+            </div>
+            <div class="photo-frame" style="--delay: 0.2s;">
+                <img src="./pic2.jpg" alt="Special Moment 2">
+            </div>
+            <div class="photo-frame" style="--delay: 0.3s;">
+                <img src="./pic3.jpg" alt="Special Moment 3">
+            </div>
+            <div class="photo-frame" style="--delay: 0.4s;">
+                <img src="./pic4.jpg" alt="Special Moment 4">
+            </div>
+            <div class="photo-frame" style="--delay: 0.5s;">
+                <img src="./pic5.jpg" alt="Special Moment 5">
+            </div>
+            <div class="photo-frame" style="--delay: 0.6s;">
+                <img src="./pic6.jpg" alt="Special Moment 6">
+            </div>
+            <div class="photo-frame" style="--delay: 0.7s;">
+                <img src="./pic7.jpg" alt="Special Moment 7">
+            </div>
+            <div class="photo-frame" style="--delay: 0.8s;">
+                <img src="./pic8.jpg" alt="Special Moment 8">
+            </div>
+        </div>
+
+        <div class="message-section">
+            <h2 class="message-title">Our Journey Together</h2>
+            <p class="message-content">
+                Every moment spent with you is a blessing, every smile we share a treasure. You light up my world in ways I never thought possible. These memories we've created together are just the beginning - our adventure continues with each passing day, building a collection of moments that tell our unique story.
+            </p>
+            <div class="signature">With love always ❤️</div>
+            <!-- <button class="special-button" id="surpriseButton">Click For More Memories</button> -->
+        </div>
+
+        <div class="bubble-decoration bubble-1">○</div>
+        <div class="bubble-decoration bubble-2">○</div>
+    </div>
+
+    <div class="bubbles-container" id="bubblesContainer"></div>
+
+    <script>
+        // Wait for DOM to fully load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animation delay for photos
+            const frames = document.querySelectorAll('.photo-frame');
+            frames.forEach((frame, index) => {
+                frame.style.animationDelay = `${index * 0.15}s`;
+            });
+
+            // Surprise button
+            const surpriseButton = document.getElementById('surpriseButton');
+            surpriseButton.addEventListener('click', function() {
+                createConfettiBurst();
+                setTimeout(() => {
+                    window.location.href = 'more_memories.html'; // Replace with actual URL
+                }, 2000);
+            });
+
+            // Floating bubbles animation
+            const bubblesContainer = document.getElementById('bubblesContainer');
+            const bubbleSymbols = ['○', '◌', '◯', '⚪', '⭘'];
+            
+            function createBubble() {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                bubble.textContent = bubbleSymbols[Math.floor(Math.random() * bubbleSymbols.length)];
+                
+                // Random position and animation
+                const startPosition = Math.random() * 100;
+                const translateX = Math.random() * 150 - 75; // Random movement left or right
+                const rotate = Math.random() * 60 - 30; // Random rotation
+                bubble.style.left = `${startPosition}%`;
+                bubble.style.setProperty('--translateX', `${translateX}px`);
+                bubble.style.setProperty('--rotate', `${rotate}deg`);
+                bubble.style.animationDuration = `${8 + Math.random() * 7}s`; // Random duration
+                bubble.style.color = `hsl(${187 + Math.random() * 20}, 90%, 65%)`;
+                bubble.style.fontSize = `${20 + Math.random() * 30}px`;
+                
+                bubblesContainer.appendChild(bubble);
+                
+                // Remove bubble after animation completes
+                setTimeout(() => {
+                    bubble.remove();
+                }, 15000);
+            }
+            
+            // Create bubbles at random intervals
+            setInterval(createBubble, 600);
+            
+            // Create initial bubbles
+            for (let i = 0; i < 10; i++) {
+                setTimeout(createBubble, i * 300);
+            }
+
+            // Confetti animation
+            const confettiContainer = document.getElementById('confettiContainer');
+            const confettiColors = [
+                '#26c6da', '#00acc1', '#80deea', '#e0f7fa', 
+                '#4dd0e1', '#00838f', '#0097a7', '#006064'
+            ];
+
+            function createConfetti() {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                
+                // Random properties
+                const size = Math.random() * 10 + 5;
+                confetti.style.width = `${size}px`;
+                confetti.style.height = `${size}px`;
+                confetti.style.backgroundColor = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.opacity = Math.random() * 0.8 + 0.2;
+                
+                // Random animation duration and delay
+                confetti.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                confetti.style.animationDelay = `${Math.random() * 5}s`;
+                
+                confettiContainer.appendChild(confetti);
+                
+                // Remove confetti after animation
+                setTimeout(() => {
+                    confetti.remove();
+                }, 8000);
+            }
+
+            function createConfettiBurst() {
+                for (let i = 0; i < 100; i++) {
+                    setTimeout(() => {
+                        createConfetti();
+                    }, i * 20);
+                }
+            }
+
+            // Create confetti periodically
+            setInterval(() => {
+                for (let i = 0; i < 3; i++) {
+                    createConfetti();
+                }
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
